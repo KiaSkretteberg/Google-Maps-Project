@@ -1,4 +1,4 @@
-# Google-Maps-Project
+# Google Maps Project
 A simple google maps api project for school demonstrating various map functions including:
 <ul>
   <li>Loading Maps with Buttons</li>
