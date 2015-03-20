@@ -1,17 +1,12 @@
 # Google-Maps-Project
 A simple google maps api project for school demonstrating various map functions including:
 
-  • Loading Maps with Buttons
-
-  • Placing Markers on Maps
-
-  • Giving Markers Info Windows
-
-  • Using Custom Marker Icons
-
-  • Drawing on Maps With Lines and Shapes
-
-  • Customizing the Map Controls
+  • Loading Maps with Buttons<br>
+  • Placing Markers on Maps<br>
+  • Giving Markers Info Windows<br>
+  • Using Custom Marker Icons<br>
+  • Drawing on Maps With Lines and Shapes<br>
+  • Customizing the Map Controls<br>
 
   • Changing Map Colours e.g. Roads, Terrain, etc.
 
