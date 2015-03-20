@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+    /* Good basic settings for a mobile map, but for our purposes, we'll design for desktop. */
+
+      html { height: 100% }
+      body { 
+        height: 100%; 
+        margin: 0; 
+        padding: 0;
+        background: url('background.jpg');
+        background-size: cover;
+        background-position: center; 
+      }
+      #map_canvas { 
+        width: 100%;
+        height: 100%;
+        box-shadow: 5px 5px 15px #000;
+        /*border: 1px solid #444;*/
+      }
+      .map-btn {
+        position: absolute;
+        box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, 0.7);
+        border: 0;
+        background: transparent;
+        font-size: 0;
+        background-size: cover;
+      }
+      .map-btn:hover{
+        cursor: pointer;
+      }
+      .map-btn, .map-btn:hover, .map-btn:active {
+        outline: none;
+      }
+      #ireland {
+        top: 3%;
+        left: 35%;
+        height: 120px;
+        width: 173px;
+        /*background: url('ricepaper_v3.png');*/
+        background-image: url('ireland-postcard.jpg');
+        transform: rotate(-17deg);
+      }
+      #ireland:hover {
+        width: 187px;
+        height:130px;
+        top: 2%;
+        left: 34.5%;
+      }
+      #norway {
+        bottom: 10%;
+        right: 10%;
+        height: 120px;
+        width: 173px;
+        /*background: url('ricepaper_v3.png');*/
+        background-image: url('norwaypostcard.jpg');
+        transform: rotate(5deg);
+      }
+      #norway:hover {
+        width: 187px;
+        height:130px;
+        bottom: 11%;
+        right: 9%;
+      }
+      #norwayFlightPath{
+        bottom: 29%;
+        right: 10%;
+        height: 70px;
+        width: 173px;
+        background: url('boarding-pass.png');
+        background-size: cover;
+        background-position: center;
+      }
+      #norwayFlightPath:hover {
+        width: 180px;
+        height:72px;
+        bottom: 30%;
+        right: 9%;
+      }
+
+  	  @media(min-width: 640px){
+        #map_canvas { 
+      	   height: 480px; 
+      	   width: 640px;
+      	   margin: 0 auto 0;
+           position: relative;
+           top: 25%;
+    	  }
+      }
+      .info-window {
+        box-sizing: border-box;
+        height: 100px;
+        width: 290px;
+        padding: 0;
+        font-size: 1.1em;
+      }
+      .airport.info-window {
+        width: auto;
+        height: 40px;
+      }
+      .info-window *{
+        margin: 0;
+        padding: 0;
+      }
+      .image {
+        float: left;
+        width: 50%;
+        padding-top: 50%;
+        background: url('blarney_castle.jpg');
+        background-size: cover;
+        background-position: center;
+      }
+      .main-info {
+        float: left;
+      }
+      .main-info.with-image{
+        box-sizing: border-box;
+        width: 50%;
+        padding-left: 10px;
+      }
+      .info-window a.website, .info-window span {
+        display: block;
+        float: left;
+        width: 90px;
+        font-size: 0.9em;
+      }
+      .info-window span a {
+        padding-right: 7px;
+      }
+	  
+    </style>
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js"></script>
+    <script type="text/javascript">
+      function initialize() {
+        document.getElementById('norwayFlightPath').style.display = 'block';
+        var mapOptions = {
+          center: new google.maps.LatLng(59.928280, 10.332071),
+          zoom: 7,
+          mapTypeId: google.maps.MapTypeId.HYBRID,
+          //controls
+          panControl: false,
+          streetViewControl: false,
+          overviewMapControl: false,
+          mapTypeControl: true,
+          mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+          },
+          zoomControl: true,
+          zoomControlOptions:{
+            style: google.maps.ZoomControlStyle.SMALL 
+          },
+        }; // end map options
+        var map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions)
+
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(59.996065, 9.892332),
+          map: map,
+          animation: google.maps.Animation.DROP,
+          title: "Skretteberg",
+          icon: "farm-2.png"
+        });
+        var myInfoWindow = new google.maps.InfoWindow({
+          content: "<div class='info-window'><div class='main-info'><h3>Skretteberg</h3><p>Skretteberg roughly translates from Norwegian to English as 'the hilly land belonging to Skrett'. Skrett was a farm owner in Norwary who owned a large area of farm land. Many different families worked and lived on this farm land.These familes had the option to choose from a couple different last names; Skretteberg was one of those options.</p></div>"
+        });
+        myInfoWindow.open(map, marker);
+
+        function seeNorwayFlightPath(map, zoom){
+          marker.setMap(null);
+          map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+          map.setZoom(zoom)
+          map.setCenter(new google.maps.LatLng(57.090040, -35.393726));
+          var flightPlanCoordinates = [
+            new google.maps.LatLng(53.307535, -113.584784), //Edmonton Airport
+            new google.maps.LatLng(51.125061,-114.016889), //Calgary Airport
+            new google.maps.LatLng(50.037933,8.562152), //Frankfurt Airport
+            new google.maps.LatLng(60.19755,11.100415) //Oslo Airport
+          ];
+          var lineSymbol = {
+            path: 'M 0,-1 0,1',
+            strokeOpacity: 1,
+            strokeColor: '#ff0000',
+            scale: 3
+          };
+          var flightPath = new google.maps.Polyline({
+            path: flightPlanCoordinates,
+            geodesic: true,
+            strokeOpacity: 0,
+            strokeWeight: 2,
+            icons: [{
+              icon: lineSymbol,
+              offset: '0',
+              repeat: '20px'
+            }],
+          });
+
+          flightPath.setMap(map);
+          //create infowindow for use with airport markers
+          var airportInfoWindow = new google.maps.InfoWindow();
+
+          //marker for edmonton airport
+          var yegMarker = new google.maps.Marker({
+            position: new google.maps.LatLng(53.307535, -113.584784),
+            map: map,
+            title: "Edmonton International Airport (YEG)",
+            icon: "airport.png"
+          });
+          //infowindow for edmonton airport
+          google.maps.event.addListener(yegMarker, "click", function(){
+            airportInfoWindow.setContent("<div class='airport info-window'><div class='main-info'><h3>Edmonton International Airport</h3><i>(YEG)</i></div>");
+            airportInfoWindow.open(map, this);
+          }); 
+          //marker for calgary airport
+          var yycMarker = new google.maps.Marker({
+            position: new google.maps.LatLng(51.125061,-114.016889),
+            map: map,
+            title: "Calgary International Airport (YYC)",
+            icon: "airport.png"
+          });
+          //infowindow for calgary airport
+          google.maps.event.addListener(yycMarker, "click", function(){
+            airportInfoWindow.setContent("<div class='airport info-window'><div class='main-info'><h3>Calgary International Airport</h3><i>(YYC)</i></div>");
+            airportInfoWindow.open(map, this);
+          }); 
+          //marker for frankfurt airport
+          var fraMarker = new google.maps.Marker({
+            position: new google.maps.LatLng(50.037933,8.562152),
+            map: map,
+            title: "Frankfurt International Airport (FRA)",
+            icon: "airport.png"
+          });
+          //infowindow for frankfurt airport
+          google.maps.event.addListener(fraMarker, "click", function(){
+            airportInfoWindow.setContent("<div class='airport info-window'><div class='main-info'><h3>Frankfurt International Airport</h3><i>(FRA)</i></div>");
+            airportInfoWindow.open(map, this);
+          }); 
+          //marker for oslo airport
+          var oslMarker = new google.maps.Marker({
+            position: new google.maps.LatLng(60.19755,11.100415),
+            map: map,
+            title: "Oslo Airport (OSL)",
+            icon: "airport.png"
+          });
+          //infowindow for oslo airport
+          google.maps.event.addListener(oslMarker, "click", function(){
+            airportInfoWindow.setContent("<div class='airport info-window'><div class='main-info'><h3>Oslo Airport</h3><i>(OSL)</i></div>");
+            airportInfoWindow.open(map, this);
+          }); 
+        }
+        document.getElementById('norwayFlightPath').addEventListener("click", function(){
+          seeNorwayFlightPath(map, 2);
+        });
+      }; // end initialize
+      function gotoIreland() {
+        document.getElementById('norwayFlightPath').style.display = 'none';
+        var mapOptions = {
+          center: new google.maps.LatLng(51.929092,-8.570885),
+          zoom: 13, //goes up to about 21
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+        }; // end map options
+
+        var mapStyles = [
+            {
+              stylers: [
+                { hue: "#00ffe6" },
+                { saturation: -20 }
+              ]
+            },{
+              featureType: "road",
+              elementType: "geometry",
+              stylers: [
+                { lightness: 100 },
+                { visibility: "simplified" }
+              ]
+            },{
+              featureType: "road",
+              elementType: "labels",
+              stylers: [
+                { visibility: "off" }
+              ]
+            }
+          ];
+        var map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions)
+        map.setOptions({styles:mapStyles});
+
+        //display rough outline of blarney
+        var myCoordinates = [
+          new google.maps.LatLng(51.936010,-8.564186),
+          new google.maps.LatLng(51.937069,-8.569078),
+          new google.maps.LatLng(51.935534,-8.570623),
+          new google.maps.LatLng(51.934317,-8.571568),
+          new google.maps.LatLng(51.931565,-8.569164),
+          new google.maps.LatLng(51.932147,-8.567362),
+          new google.maps.LatLng(51.930295,-8.562984),
+          new google.maps.LatLng(51.929342,-8.558950),
+          new google.maps.LatLng(51.933259,-8.559895)
+        ];
+        var polyOptions = {
+          path: myCoordinates,
+          strokeColor: "#880000",
+          strokeOpacity: 0.6,
+          strokeWeight: 2,
+          fillColor: "#ff0000",
+          fillOpacity: 0.3
+        }
+        var blarney = new google.maps.Polygon(polyOptions);
+        blarney.setMap(map);
+
+        //display population radius of blarney - estimated as to the rough area of blarney
+        var populationOptions = {
+          strokeColor: '#FFFF00',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FFFF00',
+          fillOpacity: 0.35,
+          map: map,
+          center: new google.maps.LatLng(51.934358,-8.5669615),
+          radius: Math.sqrt(5226) * 30
+        };
+        // Add the circle for this city to the map.
+        cityCircle = new google.maps.Circle(populationOptions);
+         var myAtomicBlastRadius = {
+          strokeColor: "#FF0000",
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+          fillColor: "#FF0000",
+          fillOpacity: 0.35,
+          map: map,
+          center: new google.maps.LatLng(53.540933, -113.497153),
+          radius: 1000
+        };
+
+        var cityCircle = new google.maps.Circle(myAtomicBlastRadius);
+
+        //marker for blarney castle
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(51.929092,-8.570885),
+          map: map,
+          animation: google.maps.Animation,
+          title: "Blarney Castle",
+          icon: "castle-2.png"
+        });
+        var myInfoWindow = new google.maps.InfoWindow({
+          content: "<div class='info-window'><div class='image'></div><div class='main-info with-image'><h3>Blarney Castle</h3><p>Ruined castle housing the famed Blarney Stone, a kiss of which is said to grant the gift of the gab.</p></div>"
+        });
+        google.maps.event.addListener(marker, "click", function(){
+          myInfoWindow.open(map, marker);
+        }); 
+     
+      }; // end gotoireland
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+  <body>
+    <div id="map_canvas"></div>
+    <button id='ireland' class='map-btn' onclick='gotoIreland()' title='Go To Ireland'>Go To Ireland</button>
+    <button id='norway' class='map-btn' onclick='initialize()' title='Go To Ireland'>Go To Norway</button>
+    <button id='norwayFlightPath' class='map-btn' title='View Flight Path'>View Flight Path</button>
+  </body>
+</html>
